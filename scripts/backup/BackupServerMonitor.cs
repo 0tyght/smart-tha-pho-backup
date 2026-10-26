@@ -68,7 +68,7 @@ namespace SmartThaPho.Backup {
   internal static class Program {
     [STAThread] static void Main(string[] args) {
       bool created;using(var mutex=new Mutex(true,"Local\\SmartThaPhoBackupMonitor",out created)){
-        if(!created){MessageBox.Show("ตัวเปิดเซิร์ฟเวอร์สำรองเปิดอยู่แล้ว");return;}
+        if(!created && !(args.Length==2 && args[0]=="--capture")){MessageBox.Show("ตัวเปิดเซิร์ฟเวอร์สำรองเปิดอยู่แล้ว");return;}
         Application.EnableVisualStyles();Application.SetCompatibleTextRenderingDefault(false);
         var root=Environment.GetEnvironmentVariable("SMART_THA_PHO_BACKUP_ROOT")??@"C:\xampp\htdocs\smart-tha-pho-backup";
         if(args.Length==2 && args[0]=="--capture") {using(var form=new MonitorForm(new BackupController(root),false)){form.Show();Application.DoEvents();using(var bitmap=new Bitmap(form.Width,form.Height)){form.DrawToBitmap(bitmap,new Rectangle(0,0,form.Width,form.Height));bitmap.Save(args[1],System.Drawing.Imaging.ImageFormat.Png);} }return;}

@@ -61,7 +61,13 @@ try {
   for($i=0;$i -lt 90;$i++){
     if($tunnel.HasExited){throw 'Tunnel stopped unexpectedly; see tunnel.log'}
     $log=Get-Content -LiteralPath (Join-Path $runtime 'tunnel.log') -Raw -ErrorAction SilentlyContinue
-    if($log -match 'https://[a-z0-9-]+\.trycloudflare\.com'){$url=$matches[0];$public=Get-Health "$url/api/health";if($public.database -eq 'ready'){break}}
+    if($log -match 'https://[a-z0-9-]+\.trycloudflare\.com'){
+      $url=$matches[0]
+      if(!$status.url){$status.url=$url;$status.message='ตรวจสอบลิงก์ออนไลน์และรอ DNS';Write-Status}
+      if($i -eq 0 -or $i % 15 -eq 0){try{Clear-DnsClientCache -ErrorAction Stop}catch{}}
+      $public=Get-Health "$url/api/health"
+      if($public.database -eq 'ready'){break}
+    }
     Start-Sleep -Seconds 1
   }
   if(!$url -or $public.database -ne 'ready'){throw 'Public tunnel is not ready; local server is still available'}
