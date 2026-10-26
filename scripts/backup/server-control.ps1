@@ -20,7 +20,12 @@ function Stop-Owned($record) {
   $p=Get-Process -Id $record.id -ErrorAction SilentlyContinue
   if($p -and $p.Path -eq $record.path -and $p.StartTime.ToUniversalTime().ToString('o') -eq $record.startTime){Stop-Process -Id $p.Id -Force}
 }
-function Get-Health($url) { try { Invoke-RestMethod -Uri $url -TimeoutSec 4 } catch { $null } }
+function Get-Health($url) {
+  # A fresh curl process avoids the long negative-DNS cache in Windows PowerShell/.NET.
+  $body=& "$env:WINDIR\System32\curl.exe" --fail --silent --max-time 5 $url 2>$null
+  if($LASTEXITCODE -ne 0){return $null}
+  try{$body|ConvertFrom-Json}catch{$null}
+}
 $mutex=New-Object Threading.Mutex($false,'Local\SmartThaPhoBackupControl')
 if(!$mutex.WaitOne(0)){throw 'Another backup control operation is running'}
 try {
@@ -58,13 +63,18 @@ try {
   $tunnel=Start-Process -FilePath $config.cloudflared -ArgumentList @('tunnel','--no-autoupdate','--protocol','http2','--url','http://127.0.0.1:4200') -WorkingDirectory $root -WindowStyle Hidden -PassThru -RedirectStandardOutput (Join-Path $runtime 'tunnel-output.log') -RedirectStandardError (Join-Path $runtime 'tunnel.log')
   $state.tunnel=Process-Record $tunnel;Save-State
   $url=''
-  for($i=0;$i -lt 90;$i++){
+  $deadline=[DateTime]::UtcNow.AddMinutes(3)
+  for($i=0;[DateTime]::UtcNow -lt $deadline;$i++){
     if($tunnel.HasExited){throw 'Tunnel stopped unexpectedly; see tunnel.log'}
     $log=Get-Content -LiteralPath (Join-Path $runtime 'tunnel.log') -Raw -ErrorAction SilentlyContinue
     if($log -match 'https://[a-z0-9-]+\.trycloudflare\.com'){
       $url=$matches[0]
       if(!$status.url){$status.url=$url;$status.message='ตรวจสอบลิงก์ออนไลน์และรอ DNS';Write-Status}
-      if($i -eq 0 -or $i % 15 -eq 0){try{Clear-DnsClientCache -ErrorAction Stop}catch{}}
+      if($i -eq 0 -or $i % 15 -eq 0){
+        try{Clear-DnsClientCache -ErrorAction Stop}catch{}
+        # Public DNS lookup only; never change the machine's configured DNS servers.
+        try{Resolve-DnsName ([Uri]$url).Host -Server 1.1.1.1 -Type A -DnsOnly -QuickTimeout -ErrorAction Stop | Out-Null}catch{}
+      }
       $public=Get-Health "$url/api/health"
       if($public.database -eq 'ready'){break}
     }
