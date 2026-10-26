@@ -6,6 +6,7 @@ $runtime=Join-Path $root '.runtime\backup'
 New-Item -ItemType Directory -Path $runtime -Force | Out-Null
 $statusPath=Join-Path $runtime 'status.json'
 $statePath=Join-Path $runtime 'processes.json'
+$cancelPath=Join-Path $runtime 'cancel-start'
 $utf8=New-Object Text.UTF8Encoding($false)
 $state=@{api=$null;tunnel=$null}
 $status=@{phase='starting';message='กำลังเริ่มระบบ';database='checking';api='waiting';online='waiting';url='';portalUrl='https://0tyght.github.io/smart-tha-pho-backup/';updatedAt=''}
@@ -14,6 +15,7 @@ function Write-Status {
   [IO.File]::WriteAllText($statusPath,($status|ConvertTo-Json -Depth 5),$utf8)
 }
 function Save-State { [IO.File]::WriteAllText($statePath,($state|ConvertTo-Json -Depth 5),$utf8) }
+function Check-Cancel {if(Test-Path -LiteralPath $cancelPath){throw [OperationCanceledException]::new('Startup cancelled')}}
 function Process-Record($process) { @{id=$process.Id;startTime=$process.StartTime.ToUniversalTime().ToString('o');path=$process.Path} }
 function Stop-Owned($record) {
   if(!$record){return}
@@ -53,6 +55,7 @@ try {
   $state.api=Process-Record $api;Save-State
   $healthy=$false
   for($i=0;$i -lt 30;$i++){
+    Check-Cancel
     if($api.HasExited){throw 'API stopped unexpectedly; see api-error.log'}
     $health=Get-Health 'http://127.0.0.1:4200/api/health'
     if($health.database -eq 'ready'){$healthy=$true;break}
@@ -65,6 +68,7 @@ try {
   $url=''
   $deadline=[DateTime]::UtcNow.AddMinutes(3)
   for($i=0;[DateTime]::UtcNow -lt $deadline;$i++){
+    Check-Cancel
     if($tunnel.HasExited){throw 'Tunnel stopped unexpectedly; see tunnel.log'}
     $log=Get-Content -LiteralPath (Join-Path $runtime 'tunnel.log') -Raw -ErrorAction SilentlyContinue
     if($log -match 'https://[a-z0-9-]+\.trycloudflare\.com'){
@@ -82,6 +86,7 @@ try {
   }
   if(!$url -or $public.database -ne 'ready'){throw 'Public tunnel is not ready; local server is still available'}
   $status.url=$url;$status.online='ready';$status.message='อัปเดตลิงก์เว็บไซต์สำรองบน GitHub';Write-Status
+  Check-Cancel
   $runtimeConfig=@{apiBaseUrl="$url/api";portalApiBaseUrl="$url/api";portalUrl=$status.portalUrl;updatedAt=[DateTime]::UtcNow.ToString('o')}
   $paths=@('runtime-config.json')
   [IO.File]::WriteAllText((Join-Path $root 'runtime-config.json'),($runtimeConfig|ConvertTo-Json),$utf8)
@@ -105,6 +110,14 @@ try {
   if($LASTEXITCODE -ne 0){throw 'Git push failed. Use the direct online URL while resolving Git access.'}
   $status.phase='ready';$status.message='พร้อมใช้งาน • รอ GitHub Pages อัปเดตประมาณ 1–3 นาที';Write-Status
 } catch {
+  if($_.Exception -is [OperationCanceledException]){
+    Stop-Owned $state.tunnel;Stop-Owned $state.api
+    $state.api=$null;$state.tunnel=$null;Save-State
+    Remove-Item -LiteralPath $cancelPath -Force -ErrorAction SilentlyContinue
+    $status.phase='stopped';$status.message='ยกเลิกการเริ่มและหยุดระบบสำรองแล้ว';$status.database='shared';$status.api='stopped';$status.online='stopped';Write-Status
+    exit 0
+  }
+  foreach($service in @('database','api','online')){if($status[$service] -ne 'ready'){$status[$service]='error'}}
   $status.phase='error';$status.message=$_.Exception.Message;Write-Status
   Write-Error $_
   exit 1
