@@ -2,6 +2,19 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { StandbyExternalTransport } from './StandbyExternalTransport.mjs';
 import { NavigationService } from '../../packages/web-core/src/application/NavigationService.js';
+import { SessionStore } from '../../packages/web-core/src/application/SessionStore.js';
+
+test('backup login/logout never overwrites or clears the primary website session',()=>{
+  const values=new Map([['smart_thapho_access_token','primary-token'],['smart_thapho_active_system','pet']]);
+  const storage={getItem:key=>values.get(key)??null,setItem:(key,value)=>values.set(key,value),removeItem:key=>values.delete(key)};
+  const session=new SessionStore({storage,transientStorage:null,windowObject:{location:{hostname:'0tyght.github.io'}}});
+  assert.equal(session.getAccessToken(),'');
+  session.setAccessToken('backup-token');session.setActiveSystem('waste');
+  assert.equal(session.getAccessToken(),'backup-token');
+  session.clear();
+  assert.equal(values.get('smart_thapho_access_token'),'primary-token');
+  assert.equal(values.get('smart_thapho_active_system'),'pet');
+});
 
 test('standby refuses LINE API calls before any network request',async()=>{
   let calls=0;const transport=new StandbyExternalTransport({fetchImplementation:async()=>{calls++;}});

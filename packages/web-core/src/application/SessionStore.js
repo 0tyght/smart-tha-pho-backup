@@ -1,6 +1,6 @@
-const ACCESS_TOKEN_KEY = "smart_thapho_access_token";
-const ACTIVE_SYSTEM_KEY = "smart_thapho_active_system";
-const LEGACY_ACCESS_TOKEN_KEY = "prms_access_token";
+const ACCESS_TOKEN_KEY = "smart_thapho_backup_access_token";
+const ACTIVE_SYSTEM_KEY = "smart_thapho_backup_active_system";
+const LEGACY_ACCESS_TOKEN_KEY = "prms_backup_access_token";
 const LOCAL_SESSION_PARAM = "smart_thapho_session";
 const LOCAL_SYSTEM_PARAM = "smart_thapho_system";
 

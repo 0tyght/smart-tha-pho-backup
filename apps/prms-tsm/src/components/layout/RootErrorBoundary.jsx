@@ -119,9 +119,9 @@ export default class RootErrorBoundary extends Component {
 
   handleLoginAgain = () => {
     try {
-      sessionStorage.removeItem("prms_access_token");
-      sessionStorage.removeItem("smart_thapho_access_token");
-      sessionStorage.removeItem("smart_thapho_active_system");
+      sessionStorage.removeItem("prms_backup_access_token");
+      sessionStorage.removeItem("smart_thapho_backup_access_token");
+      sessionStorage.removeItem("smart_thapho_backup_active_system");
     } catch {
       // ดำเนินการต่อแม้ sessionStorage ใช้ไม่ได้
     }

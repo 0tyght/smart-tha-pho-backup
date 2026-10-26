@@ -35,6 +35,9 @@ jobs:
       - name: Run API and shared tests
         run: npm test
 
+      - name: Validate backup isolation
+        run: node --test scripts/backup/backup.test.mjs
+
       - name: Validate API runtime syntax
         run: |
           node --check apps/api/src/composition-root/createApiRuntime.js

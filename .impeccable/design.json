@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-26T19:10:05+07:00",
+  "title": "Design System: Smart Tha Pho Backup Monitor",
+  "extensions": {
+    "nativeSurface": {
+      "platform": "Windows WinForms",
+      "scope": "Backup monitor only; excludes the four existing web applications.",
+      "source": "C:/xampp/htdocs/smart-tha-pho-backup/scripts/backup/BackupServerMonitor.cs",
+      "rendering": "Application.EnableVisualStyles; AutoScaleMode.Dpi; platform-owned control chrome and interaction states.",
+      "assetPolicy": "No shipping raster assets. QA captures are evidence only.",
+      "previewPolicy": "No HTML/CSS replicas or invented tonal ramps: this is an observed native surface, not a web component library."
+    },
+    "colorMeta": {
+      "system-window": { "role": "neutral", "displayName": "Windows system window", "purpose": "Resolved by SystemColors.Window at runtime." },
+      "ready-green": { "role": "primary", "displayName": "Ready green", "purpose": "Written ready-state labels." },
+      "error-dark-red": { "role": "secondary", "displayName": "Error dark red", "purpose": "Error message and service-failure labels." },
+      "message-dark-green": { "role": "neutral", "displayName": "Operation-message dark green", "purpose": "Non-error current-operation message." },
+      "pending-brown": { "role": "secondary", "displayName": "Non-ready state brown", "purpose": "Checking, stopped, and shared-service labels." },
+      "note-gray": { "role": "neutral", "displayName": "Footer note gray", "purpose": "Two-line operational note." }
+    },
+    "typographyMeta": {
+      "title": { "displayName": "Native window content title", "purpose": "The single top-level title; WinForms point units." },
+      "body": { "displayName": "Native control text", "purpose": "Inherited form, status, action, URL, link, and note typography; WinForms point units." }
+    }
+  },
+  "components": [
+    { "name": "Native action button", "kind": "button", "refersTo": "native-button", "description": "System.Windows.Forms.Button; equal sizing with platform hover, focus, pressed, and disabled states. Stop remains enabled during startup." },
+    { "name": "Ready status", "kind": "custom", "refersTo": "state-ready", "description": "System.Windows.Forms.Label; written ready state paired with ready ink." },
+    { "name": "Error status", "kind": "custom", "refersTo": "state-error", "description": "System.Windows.Forms.Label; explicit failure and log guidance, not color alone." },
+    { "name": "Non-ready status", "kind": "custom", "refersTo": "state-pending", "description": "System.Windows.Forms.Label; checking, stopped, and shared-service states." },
+    { "name": "Current operation", "kind": "custom", "refersTo": "status-message", "description": "Dock-filled Label with AutoEllipsis and full-text ToolTip; error phase uses the error-state token." },
+    { "name": "Direct URL", "kind": "input", "refersTo": "online-url", "description": "Read-only, dock-filled System.Windows.Forms.TextBox with Thai accessible name; no custom field styling." },
+    { "name": "Utility link", "kind": "nav", "refersTo": "native-link", "description": "Auto-sized System.Windows.Forms.LinkLabel for local website, Pages, and runtime logs; native link rendering." }
+  ],
+  "narrative": {
+    "overview": "The confirmed direction is a simple native Windows status window. This document captures the implemented WinForms monitor only; it does not define or change the design of the four existing web applications.\n\nStandard Windows controls carry appearance, focus, disabled states, and window chrome. No invented metaphor, custom theme, generated artwork, or shipping raster asset is part of this surface.",
+    "keyCharacteristics": [
+      "Native controls and DPI scaling.",
+      "Left-aligned Thai status text with explicit state labels.",
+      "A read-only online URL and four adjacent actions."
+    ],
+    "rules": [
+      { "name": "The Written State Rule", "body": "Color accompanies readable status text; it does not replace the state label.", "section": "colors" }
+    ],
+    "dos": [
+      "Do preserve the approved native Windows form and platform control behavior.",
+      "Do pair state colors with explicit readable labels.",
+      "Do keep stopping available during startup and expose failures through status text and logs."
+    ],
+    "donts": [
+      "Don't apply these tokens or layout rules to the existing web applications.",
+      "Don't introduce a decorative theme, metaphor, or raster artwork into this monitor.",
+      "Don't hard-code platform-default control colors, corners, or focus treatments as custom styling."
+    ]
+  }
+}
