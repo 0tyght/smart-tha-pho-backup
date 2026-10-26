@@ -1,5 +1,5 @@
 const DEFAULT_CONFIG_SOURCES = Object.freeze([
-  () => `https://raw.githubusercontent.com/0tyght/smart-tha-pho/main/runtime-config.json?t=${Date.now()}`,
+  () => `https://raw.githubusercontent.com/0tyght/smart-tha-pho-backup/main/runtime-config.json?t=${Date.now()}`,
   () => new URL("runtime-config.json", `${location.origin}${import.meta.env.BASE_URL}`).href,
 ]);
 

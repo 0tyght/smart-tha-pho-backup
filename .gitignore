@@ -14,3 +14,9 @@ scripts/reports/
 ~$*.docx
 storage/uploads/*
 !storage/uploads/.gitkeep
+
+# Private backup-server data and machine-specific binaries
+backups/
+*.sql.gz
+*.exe
+*.local.json

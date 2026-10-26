@@ -3,7 +3,7 @@ import react from "@vitejs/plugin-react";
 export default defineConfig({
   plugins: [react()],
   base: process.env.GITHUB_ACTIONS
-    ? "/smart-tha-pho/disaster-management/"
+    ? "/smart-tha-pho-backup/disaster-management/"
     : process.env.SMART_THA_PHO_PUBLIC_SITE
       ? "/disaster-management/"
       : "/",

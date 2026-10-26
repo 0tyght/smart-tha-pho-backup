@@ -7,7 +7,8 @@ export class NavigationService {
   }
 
   isLocalhost() {
-    return ["localhost", "127.0.0.1"].includes(this.windowObject.location.hostname);
+    return ["localhost", "127.0.0.1"].includes(this.windowObject.location.hostname)
+      && ["", "5173", "5174", "5175", "5176", "5177"].includes(String(this.windowObject.location.port ?? ""));
   }
 
   getPortalUrl() {

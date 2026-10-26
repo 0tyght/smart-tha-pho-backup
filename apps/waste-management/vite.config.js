@@ -11,7 +11,7 @@ export default defineConfig({
     },
   },
   base: process.env.GITHUB_ACTIONS
-    ? "/smart-tha-pho/waste-management/"
+    ? "/smart-tha-pho-backup/waste-management/"
     : process.env.SMART_THA_PHO_PUBLIC_SITE
       ? "/waste-management/"
       : "/",
