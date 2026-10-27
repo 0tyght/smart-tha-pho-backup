@@ -10,7 +10,7 @@ export function createDisasterApplication({
     operations: new DisasterOperationsController({
       repository: new BrowserWorkspaceRepository({
         storage,
-        key: "smart_thapho_disaster_prototype_v1",
+        key: "smart_thapho_backup_disaster_prototype_v1",
         seed: createDisasterSeed,
       }),
     }),

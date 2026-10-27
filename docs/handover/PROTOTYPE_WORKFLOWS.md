@@ -35,6 +35,8 @@ Domain ปกป้องกฎและสถานะ, Application ประ�
 
 สองระบบใช้ `BrowserWorkspaceRepository` ใน web-core ร่วมกัน มี schema version และ revision เพื่อตรวจแท็บข้อมูลเก่า; JSON เสียหรือพื้นที่เต็มต้องแจ้งข้อผิดพลาด ไม่เขียนทับอย่างเงียบ ๆ
 
+ฉบับเว็บไซต์สำรองใช้คีย์ `smart_thapho_backup_disaster_prototype_v1` และ `smart_thapho_backup_water_billing_prototype_v1` เพื่อแยกข้อมูลจากเว็บไซต์หลัก แม้ GitHub Pages ทั้งสองเว็บไซต์อยู่บน origin เดียวกัน ข้อมูลตัวอย่างของเว็บไซต์หลักจะไม่ถูกนำมารวมหรือเขียนทับ
+
 รัน `npm test` และ `npm run build` ก่อนส่งงาน โดยชุดทดสอบสาธารณภัยถูกเพิ่มเข้า pipeline รวมแล้ว
 
 ## ข้อจำกัดก่อนเชื่อม production

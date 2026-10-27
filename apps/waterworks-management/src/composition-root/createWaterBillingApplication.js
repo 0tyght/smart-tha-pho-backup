@@ -7,7 +7,7 @@ export function createWaterBillingApplication({
   return new WaterBillingController({
     repository: new BrowserWorkspaceRepository({
       storage,
-      key: "smart_thapho_water_billing_prototype_v1",
+      key: "smart_thapho_backup_water_billing_prototype_v1",
       seed: createWaterBillingSeed,
     }),
   });
